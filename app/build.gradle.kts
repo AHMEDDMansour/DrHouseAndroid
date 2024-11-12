@@ -1,21 +1,24 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
 }
 
 android {
-    namespace = "com.example.drhouseandroid"
-    compileSdk = 34
+    namespace = "com.example.appdrhouseandroid"
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.drhouseandroid"
+        applicationId = "com.example.appdrhouseandroid"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -37,6 +40,14 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
@@ -56,4 +67,15 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.navigation.compose)
+    //room db
+    implementation(libs.androidx.room.runtime)
+    kapt(libs.androidx.room.compiler)
+    //retrofitw
+    implementation(libs.retrofit)
+    implementation(libs.retrofit2.converter.gson)
+    //material icons
+    implementation(libs.androidx.material.icons.extended)
+    //preferences datastore
+//    implementation(libs.androidx.datastore.preferences)
 }
