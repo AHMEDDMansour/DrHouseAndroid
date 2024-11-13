@@ -1,8 +1,6 @@
-package com.example.appdrhouseandroid
+package com.example.appdrhouseandroid.ui.theme.signup
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,20 +22,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.appdrhouseandroid.R
+import com.example.appdrhouseandroid.Routes
+import com.example.appdrhouseandroid.ui.signup.SignUpUiState
+import com.example.appdrhouseandroid.ui.signup.SignUpViewModel
+import com.example.appdrhouseandroid.ui.theme.login.SocialButtonWithIcon
 
 @Composable
-fun SignUp(navController: NavHostController) {
+fun SignUp(navController: NavHostController, signUpViewModel: SignUpViewModel = viewModel()) {
     val name = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -46,6 +51,9 @@ fun SignUp(navController: NavHostController) {
     val isEmailValid = remember { mutableStateOf(true) }
     val isPasswordValid = remember { mutableStateOf(true) }
 
+    val signUpUiState by signUpViewModel.signUpUiState.observeAsState(SignUpUiState())
+
+    // Validation functions
     fun validateEmail(input: String): Boolean {
         return input.isNotBlank() && android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
     }
@@ -75,8 +83,34 @@ fun SignUp(navController: NavHostController) {
                 .padding(top = 132.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Social Buttons
 
+            Text(
+                "Welcome back",
+                color = Color(0xFF000000),
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .padding(bottom = 13.dp, start = 108.dp)
+            )
+
+            Text(
+                "You can search courses, apply for courses, and find\n scholarships for abroad studies",
+                color = Color(0xFF677294),
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(bottom = 76.dp, start = 46.dp, end = 46.dp)
+                    .width(283.dp)
+            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(bottom = 37.dp, start = 20.dp, end = 20.dp)
+                    .fillMaxWidth()
+            ) {
+                SocialButtonWithIcon(label = "Google", iconRes = R.drawable.google)
+                SocialButtonWithIcon(label = "Facebook", iconRes = R.drawable.facebok1)
+            }
+            // Name Text Field
             OutlinedTextField(
                 value = name.value,
                 label = { Text(text = "Name") },
@@ -100,6 +134,7 @@ fun SignUp(navController: NavHostController) {
                 )
             }
 
+            // Email Text Field
             OutlinedTextField(
                 value = email.value,
                 label = { Text(text = "Email") },
@@ -123,6 +158,7 @@ fun SignUp(navController: NavHostController) {
                 )
             }
 
+            // Password Text Field
             OutlinedTextField(
                 value = password.value,
                 label = { Text(text = "Password") },
@@ -146,10 +182,12 @@ fun SignUp(navController: NavHostController) {
                 )
             }
 
+            // Handle sign-up button click
             Button(
                 onClick = {
                     if (isNameValid.value && isEmailValid.value && isPasswordValid.value) {
-                        // Implement sign-up logic
+                        // Trigger sign-up in ViewModel
+                        signUpViewModel.signUpUser(name.value, email.value, password.value)
                     }
                 },
                 modifier = Modifier
@@ -160,6 +198,30 @@ fun SignUp(navController: NavHostController) {
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(text = "Sign Up")
+            }
+
+            // Show success or error message based on sign-up result
+            signUpUiState.successMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Green,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 20.dp, top = 10.dp)
+                )
+            }
+
+            signUpUiState.errorMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 20.dp, top = 10.dp)
+                )
+            }
+
+            // Navigate to next screen after successful sign-up
+            if (signUpUiState.isSignedUp && !signUpUiState.hasNavigated) {
+                navController.navigate(Routes.Login.route) // Replace with actual route
             }
         }
     }
