@@ -9,7 +9,7 @@ import androidx.navigation.compose.composable
 
 @Composable
 fun NavigationGraph(navController: NavHostController, onBottomBarVisibilityChanged: (Boolean) -> Unit) {
-    NavHost(navController, startDestination = Routes.LunchScreen.route) {
+    NavHost(navController, startDestination = Routes.Home.route) {
 
         composable(Routes.Home.route) {
             onBottomBarVisibilityChanged(true)
