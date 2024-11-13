@@ -76,11 +76,11 @@ fun Login(navController: NavHostController) {
                     .padding(bottom = 37.dp, start = 20.dp, end = 20.dp)
                     .fillMaxWidth()
             ) {
-                SocialButton(
+                SocialButtonWithIcon(
                     label = "Google",
                     iconRes = R.drawable.google
                 )
-                SocialButton(
+                SocialButtonWithIcon(
                     label = "Facebook",
                     iconRes = R.drawable.facebok1
                 )
@@ -148,7 +148,7 @@ fun Login(navController: NavHostController) {
 }
 
 @Composable
-fun SocialButton(label: String, iconRes: Int) {
+fun SocialButtonWithIcon(label: String, iconRes: Int) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,

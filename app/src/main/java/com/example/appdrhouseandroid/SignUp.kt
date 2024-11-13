@@ -38,22 +38,34 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun SignUp(navController: NavHostController) {
-    val email = remember { mutableStateOf("") }
     val name = remember { mutableStateOf("") }
-
+    val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    //var confirmPassword = remember { mutableStateOf("") }
-   // var signUpError = remember { mutableStateOf<String?>(null) }
-    val isEmailValid = remember { mutableStateOf(false) }
-    val isPasswordValid = remember { mutableStateOf(false) }
+
+    val isNameValid = remember { mutableStateOf(true) }
+    val isEmailValid = remember { mutableStateOf(true) }
+    val isPasswordValid = remember { mutableStateOf(true) }
+
+    fun validateEmail(input: String): Boolean {
+        return input.isNotBlank() && android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()
+    }
+
+    fun validateName(input: String): Boolean {
+        return input.isNotBlank()
+    }
+
+    fun validatePassword(input: String): Boolean {
+        val hasUpperCase = input.any { it.isUpperCase() }
+        val hasLowerCase = input.any { it.isLowerCase() }
+        val hasNumber = input.any { it.isDigit() }
+        return input.isNotBlank() && hasUpperCase && hasLowerCase && hasNumber
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.backround),
             contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center),
+            modifier = Modifier.fillMaxSize().align(Alignment.Center),
             contentScale = ContentScale.Crop
         )
 
@@ -63,129 +75,92 @@ fun SignUp(navController: NavHostController) {
                 .padding(top = 132.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                "Welcome ",
-                color = Color(0xFF000000),
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .padding(bottom = 13.dp, start = 108.dp)
-            )
+            // Social Buttons
 
-            Text(
-                "let's get started ",
-                color = Color(0xFF677294),
-                fontSize = 14.sp,
+            OutlinedTextField(
+                value = name.value,
+                label = { Text(text = "Name") },
+                onValueChange = {
+                    name.value = it
+                    isNameValid.value = validateName(it)
+                },
+                leadingIcon = { Icon(imageVector = Icons.Outlined.Person, contentDescription = "Name") },
+                isError = !isNameValid.value,
+                placeholder = { Text(text = "Name") },
                 modifier = Modifier
-                    .padding(bottom = 76.dp, start = 46.dp, end = 46.dp)
-                    .width(283.dp)
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .padding(bottom = 37.dp, start = 20.dp, end = 20.dp)
                     .fillMaxWidth()
-            ) {
-                SocialButton(
-                    label = "Google",
-                    iconRes = R.drawable.google
-                )
-                SocialButton(
-                    label = "Facebook",
-                    iconRes = R.drawable.facebok1
+                    .padding(20.dp)
+            )
+            if (!isNameValid.value) {
+                Text(
+                    text = "Name cannot be empty",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 20.dp, bottom = 8.dp)
                 )
             }
 
             OutlinedTextField(
                 value = email.value,
                 label = { Text(text = "Email") },
-                onValueChange = { email.value = it },
+                onValueChange = {
+                    email.value = it
+                    isEmailValid.value = validateEmail(it)
+                },
                 leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "Email") },
+                isError = !isEmailValid.value,
                 placeholder = { Text(text = "Email") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp)
             )
-            OutlinedTextField(
-                value = name.value,
-                label = { Text(text = "name") },
-                onValueChange = { email.value = it },
-                leadingIcon = { Icon(imageVector = Icons.Outlined.Person, contentDescription = "name") },
-                placeholder = { Text(text = "name") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-            )
+            if (!isEmailValid.value) {
+                Text(
+                    text = "Enter a valid email address",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 20.dp, bottom = 8.dp)
+                )
+            }
+
             OutlinedTextField(
                 value = password.value,
                 label = { Text(text = "Password") },
                 onValueChange = {
                     password.value = it
+                    isPasswordValid.value = validatePassword(it)
                 },
-                leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "Email") },
-                trailingIcon = {
-
-                },
+                leadingIcon = { Icon(imageVector = Icons.Outlined.Email, contentDescription = "Password") },
+                isError = !isPasswordValid.value,
                 placeholder = { Text(text = "Password") },
-
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(20.dp)
             )
-
-
-
+            if (!isPasswordValid.value) {
+                Text(
+                    text = "Password must contain uppercase, lowercase, and a number",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 20.dp, bottom = 8.dp)
+                )
+            }
 
             Button(
-                onClick = {  },
+                onClick = {
+                    if (isNameValid.value && isEmailValid.value && isPasswordValid.value) {
+                        // Implement sign-up logic
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 30.dp, vertical = 20.dp) // Reduce horizontal padding to make the button wider
-                    .height(54.dp), // Optional: Increase the height if needed
+                    .padding(horizontal = 30.dp, vertical = 20.dp)
+                    .height(54.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2980B9)),
-                shape = RoundedCornerShape(12.dp) // Adjust the corner radius as needed
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text(text = "Sign Up")
             }
-
-
-
-            Text(
-                "Already have account? Login",
-                color = Color(0xFF2980B9),
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .padding(start = 89.dp)
-                    .clickable(onClick = {navController.navigate(BottomNavigationItems.Home.route)})
-            )
-
-        }
-    }
-    @Composable
-    fun SocialButton(label: String, iconRes: Int) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clip(shape = RoundedCornerShape(12.dp))
-                .width(160.dp)
-                .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(12.dp))
-                .padding(vertical = 18.dp)
-        ) {
-            Image(
-                painter = painterResource(id = iconRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 14.dp)
-                    .width(18.dp)
-                    .height(18.dp)
-            )
-            Text(
-                label,
-                color = Color(0xFF677294),
-                fontSize = 16.sp,
-            )
         }
     }
 }
