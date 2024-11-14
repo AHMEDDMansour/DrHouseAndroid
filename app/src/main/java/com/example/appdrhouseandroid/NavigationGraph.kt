@@ -18,7 +18,10 @@ fun NavigationGraph(navController: NavHostController, onBottomBarVisibilityChang
 
         composable(Routes.Home.route) {
             onBottomBarVisibilityChanged(true)
-            Home()
+            val apiService = RetrofitClient.getApiService()
+            val userRepository = UserRepository(apiService)
+            val loginViewModel = LoginViewModel(userRepository)
+            Home(navController, loginViewModel)
         }
         composable(Routes.AIscreen.route) {
             onBottomBarVisibilityChanged(true)

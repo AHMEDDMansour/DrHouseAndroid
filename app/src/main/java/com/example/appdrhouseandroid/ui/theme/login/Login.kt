@@ -1,5 +1,7 @@
 package com.example.appdrhouseandroid.ui.theme.login
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +45,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import com.example.appdrhouseandroid.Routes
 import kotlinx.coroutines.launch
 @Composable
@@ -50,6 +54,26 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
     var password by remember { mutableStateOf("") }
     val emailError = remember { mutableStateOf<String?>(null) }
     val passwordError = remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+    val checked = remember { mutableStateOf(sharedPreferences.getBoolean("RememberMe", false)) }
+
+    // Check if RememberMe is true and if credentials are saved
+    val savedEmail = sharedPreferences.getString("Email", "")
+    val savedPassword = sharedPreferences.getString("Password", "")
+
+    if (checked.value && !savedEmail.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {
+        // If "Remember Me" is checked and credentials are found, navigate to Home directly
+        LaunchedEffect(true) {
+            navController.navigate(BottomNavigationItems.Home.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
 
     val emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$")
     val loginUiState by viewModel.loginUiState.observeAsState(LoginUiState())
@@ -169,6 +193,16 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 onClick = {
                     // Trigger login action
                     viewModel.loginUser(email, password)
+
+                    // If Remember Me is checked, save the email and password
+                    if (checked.value) {
+                        sharedPreferences.edit().apply {
+                            putString("Email", email)
+                            putString("Password", password)
+                            putBoolean("RememberMe", true)
+                            apply()
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -199,6 +233,20 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                         }
                     }
                 }
+            }
+
+            Row(modifier = Modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = checked.value,
+                    onCheckedChange = {
+                        checked.value = it
+                        if (!it) {
+                            // If unchecked, clear saved credentials
+                            sharedPreferences.edit().clear().apply()
+                        }
+                    }
+                )
+                Text(text = "Remember me")
             }
 
             // Forgot password link
@@ -237,6 +285,7 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
         )
     }
 }
+
 
 @Composable
 fun SocialButtonWithIcon(label: String, iconRes: Int) {

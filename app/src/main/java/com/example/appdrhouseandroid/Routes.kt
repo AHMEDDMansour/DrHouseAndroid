@@ -10,6 +10,7 @@ sealed class Routes(val route: String){
     object LunchScreen : Routes("LunchScreen")
     object Login : Routes ("Login")
     object SignUp : Routes ("SignUp")
+    object ForgetPassword : Routes ("ForgetPassword")
 
 
 
