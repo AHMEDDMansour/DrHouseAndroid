@@ -1,5 +1,6 @@
 package com.example.appdrhouseandroid.ui.theme.login
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,11 @@ class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
     private var _loginUiState: MutableLiveData<LoginUiState> = MutableLiveData(LoginUiState())
     val loginUiState: LiveData<LoginUiState> get() = _loginUiState // Expose as LiveData
 
+
+    fun logout(context: Context) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        sharedPreferences.edit().clear().apply() // Clear all preferences
+    }
     // Function to handle user login
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {

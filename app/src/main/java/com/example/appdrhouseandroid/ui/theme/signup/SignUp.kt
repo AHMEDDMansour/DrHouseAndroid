@@ -1,6 +1,7 @@
 package com.example.appdrhouseandroid.ui.theme.signup
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -85,7 +87,7 @@ fun SignUp(navController: NavHostController, signUpViewModel: SignUpViewModel = 
         ) {
 
             Text(
-                "Welcome back",
+                "Welcome",
                 color = Color(0xFF000000),
                 fontSize = 24.sp,
                 modifier = Modifier
@@ -93,7 +95,7 @@ fun SignUp(navController: NavHostController, signUpViewModel: SignUpViewModel = 
             )
 
             Text(
-                "You can search courses, apply for courses, and find\n scholarships for abroad studies",
+                "Dr House",
                 color = Color(0xFF677294),
                 fontSize = 14.sp,
                 modifier = Modifier
@@ -162,6 +164,7 @@ fun SignUp(navController: NavHostController, signUpViewModel: SignUpViewModel = 
             OutlinedTextField(
                 value = password.value,
                 label = { Text(text = "Password") },
+                visualTransformation = PasswordVisualTransformation(),
                 onValueChange = {
                     password.value = it
                     isPasswordValid.value = validatePassword(it)
@@ -188,6 +191,7 @@ fun SignUp(navController: NavHostController, signUpViewModel: SignUpViewModel = 
                     if (isNameValid.value && isEmailValid.value && isPasswordValid.value) {
                         // Trigger sign-up in ViewModel
                         signUpViewModel.signUpUser(name.value, email.value, password.value)
+                        navController.navigate(Routes.Login.route)
                     }
                 },
                 modifier = Modifier
@@ -199,6 +203,15 @@ fun SignUp(navController: NavHostController, signUpViewModel: SignUpViewModel = 
             ) {
                 Text(text = "Sign Up")
             }
+
+            Text(
+                "Already have an account? Log in",
+                color = Color(0xFF2980B9),
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(start = 89.dp)
+                    .clickable{navController.navigate(Routes.Login.route)}
+            )
 
             // Show success or error message based on sign-up result
             signUpUiState.successMessage?.let {
