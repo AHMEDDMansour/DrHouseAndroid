@@ -5,6 +5,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
+import retrofit2.Call
 
 // Request model for login
 data class LoginRequest(
@@ -30,6 +31,18 @@ data class SignUpResponse(
     val message: String
 )
 
+data class ForgotPasswordRequest(val email: String)
+data class ForgotPasswordResponse(val message: String, val resetCode: String)
+
+data class VerifyCodeRequest(val email: String ,val code: String)
+
+data class VerifyCodeResponse(val message: String)
+
+data class ResetPasswordRequest(
+    val email: String,
+    val code: String,
+    val newPassword: String
+)
 
 
 
@@ -39,4 +52,13 @@ interface ApiService {
     // Login API
     @POST("auth/login")  // Adjust to match your login endpoint in the backend
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
+
+    @POST("auth/forgot-password")
+    fun forgotPassword(@Body request: ForgotPasswordRequest): Call<ForgotPasswordResponse>
+
+    @POST("auth/verify-reset-code")
+    fun verifyResetCode(@Body request: VerifyCodeRequest): Call<VerifyCodeResponse>
+
+    @POST("auth/reset-password")
+    fun resetPassword(@Body request: ResetPasswordRequest): Call<Void>
 }

@@ -11,6 +11,10 @@ sealed class Routes(val route: String){
     object Login : Routes ("Login")
     object SignUp : Routes ("SignUp")
     object ForgetPassword : Routes ("ForgetPassword")
+    object ConfirmCode : Routes ("ConfirmCode")
+    object ResetPass : Routes ("ResetPassword")
+
+
 
 
 

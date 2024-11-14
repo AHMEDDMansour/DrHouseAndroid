@@ -23,7 +23,7 @@ fun LunchScreen(navController: NavHostController){
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Green),
+            .background(Color(0xFFAEB2B5)),
         contentAlignment = Alignment.Center
     ) {
         Image(  painter = painterResource(id = R.drawable.logo),
@@ -33,7 +33,7 @@ fun LunchScreen(navController: NavHostController){
     }
     LaunchedEffect(Unit) {
         delay(3000L) // Delay for 3 seconds
-        navController.navigate(Routes.SignUp.route) {
+        navController.navigate(Routes.Login.route) {
             popUpTo(navController.graph.findStartDestination().id) {  saveState = true }
         }
     }

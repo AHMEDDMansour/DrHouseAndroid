@@ -96,7 +96,7 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 132.dp)
+                .padding(top = 90.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
@@ -256,7 +256,17 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 fontSize = 14.sp,
                 modifier = Modifier
                     .padding(start = 135.dp)
+                    .clickable(onClick = {
+                        navController.navigate(Routes.ForgetPassword.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    })
             )
+
 
             // Sign-up navigation link
             Text(
@@ -268,11 +278,8 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                     .align(Alignment.CenterHorizontally) // Align it horizontally at the center
                     .clickable {
                         navController.navigate(Routes.SignUp.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+
+
                         }
                     }
             )
