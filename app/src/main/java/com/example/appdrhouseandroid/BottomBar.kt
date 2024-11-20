@@ -8,9 +8,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun BottomBar(
@@ -27,7 +29,7 @@ fun BottomBar(
 
     )
     NavigationBar (modifier = modifier,
-        containerColor = Color.Green
+        containerColor = Color(0xFF2980B9)
         //Color(0xFF30BE30)
     ){
         val navBackStackEntry = navController.currentBackStackEntryAsState().value
@@ -62,4 +64,10 @@ fun BottomBar(
             )
         }
     }
+}
+@Preview(showBackground = true)
+@Composable
+fun BottomBarPreview() {
+    val navController = rememberNavController()
+    BottomBar(navController = navController, state = true)
 }
