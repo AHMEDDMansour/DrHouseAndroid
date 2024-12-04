@@ -32,7 +32,7 @@ fun LunchScreen(navController: NavHostController){
 
     }
     LaunchedEffect(Unit) {
-        delay(3000L) // Delay for 3 seconds
+        delay(1000L) // Delay for 3 seconds
         navController.navigate(Routes.Login.route) {
             popUpTo(navController.graph.findStartDestination().id) {  saveState = true }
         }

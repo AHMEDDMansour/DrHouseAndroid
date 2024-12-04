@@ -22,26 +22,26 @@ sealed class BottomNavigationItems (
         icon = Icons.Outlined.Home
     )
 
-    object Reminder : BottomNavigationItems(
-        route = "Reminder",
+    object HealthReminder : BottomNavigationItems(
+        route = "HealthReminder",
         title = "Reminder",
         icon = Icons.Outlined.Notifications
     )
 
-    object AIscreen : BottomNavigationItems(
-        route = "AIscreen",
+    object PredectionScreen : BottomNavigationItems(
+        route = "PredictionScreen",
         title = "AIscreen",
         icon = Icons.Outlined.Api
     )
 
-    object Screen1 : BottomNavigationItems(
-        route = "Screen1",
-        title = "Screen1",
+    object ProgressScreen : BottomNavigationItems(
+        route = "ProgressScreen",
+        title = "LifeStyle",
         icon = Icons.Outlined.Diamond
     )
 
-    object Favorite : BottomNavigationItems(
-        route = "Favorite",
+    object GoalReminder : BottomNavigationItems(
+        route = "GoalReminder",
         title = "Favorite",
         icon = Icons.Outlined.Favorite
     )

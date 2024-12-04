@@ -15,20 +15,14 @@ import com.example.appdrhouseandroid.ui.theme.login.LoginViewModel
 
 @Composable
 fun Home(navController: NavHostController, loginViewModel: LoginViewModel) {
-
     val context = LocalContext.current
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = "Welcome to Home Screen!")
 
-        // Logout Button
         Button(onClick = {
-            // Call the logout function
             loginViewModel.logout(context)
-
-            // Navigate to the login screen after logging out
             navController.navigate(Routes.Login.route) {
-                // Optional: Clear the back stack so the user can't navigate back
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                 launchSingleTop = true
             }

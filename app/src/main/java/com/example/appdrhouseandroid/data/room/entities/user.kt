@@ -1,4 +1,4 @@
-package com.example.appdrhouseandroid.data.entities
+package com.example.appdrhouseandroid.data.room.entities
 
 
 data class user (
