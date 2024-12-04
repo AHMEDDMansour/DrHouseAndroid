@@ -22,10 +22,10 @@ fun BottomBar(
 ){
     val screens = listOf(
         BottomNavigationItems.Home,
-        BottomNavigationItems.Reminder,
-        BottomNavigationItems.AIscreen,
-        BottomNavigationItems.Screen1,
-        BottomNavigationItems.Favorite
+        BottomNavigationItems.HealthReminder,
+        BottomNavigationItems.PredectionScreen,
+        BottomNavigationItems.ProgressScreen,
+        BottomNavigationItems.GoalReminder
 
     )
     NavigationBar (modifier = modifier,

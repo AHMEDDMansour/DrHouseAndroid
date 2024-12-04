@@ -9,7 +9,7 @@ import com.example.appdrhouseandroid.data.network.LoginResponse
 import com.example.appdrhouseandroid.data.repositories.UserRepository
 import kotlinx.coroutines.launch
 import retrofit2.Response
-
+import android.util.Log
 
 // Define the UI state
 data class LoginUiState(
@@ -17,52 +17,61 @@ data class LoginUiState(
     val isLoggedIn: Boolean = false,
     val token: String? = null,
     val errorMessage: String? = null,
-    val hasNavigated: Boolean = false
+    val hasNavigated: Boolean = false,
+    val isFirstLogin: Boolean = false
+
 )
 
 class LoginViewModel(private val userRepository: UserRepository) : ViewModel() {
 
     private var _loginUiState: MutableLiveData<LoginUiState> = MutableLiveData(LoginUiState())
-    val loginUiState: LiveData<LoginUiState> get() = _loginUiState // Expose as LiveData
-
+    val loginUiState: LiveData<LoginUiState> get() = _loginUiState
 
     fun logout(context: Context) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        sharedPreferences.edit().clear().apply() // Clear all preferences
+        sharedPreferences.edit().clear().apply()
     }
-    // Function to handle user login
-    fun loginUser(email: String, password: String) {
+
+    private fun saveUserData(context: Context, accessToken: String, refreshToken: String, userId: String, rememberMe: Boolean) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putString("ACCESS_TOKEN", accessToken)
+            putString("REFRESH_TOKEN", refreshToken)
+            putString("USER_ID", userId)
+            putBoolean("RememberMe", rememberMe)
+            apply()
+        }
+    }
+
+    fun loginUser(context: Context, email: String, password: String, rememberMe: Boolean) {
         viewModelScope.launch {
-            _loginUiState.value = LoginUiState(isLoading = true)  // Set loading state
+            _loginUiState.value = LoginUiState(isLoading = true)
 
             try {
-                // Make the login request
                 val response: Response<LoginResponse> = userRepository.login(email, password)
 
                 if (response.isSuccessful) {
-                    // Extract tokens and user ID from the response
                     val loginResponse = response.body()
-                    print(loginResponse)
                     if (loginResponse != null) {
-                        val accessToken = loginResponse.accessToken
+                        val accessToken = loginResponse.accestoken
                         val refreshToken = loginResponse.refreshToken
                         val userId = loginResponse.userId
+                        val isFirstLogin = loginResponse.isFirstLogin
+                        Log.d("LoginViewModel", "Login successful: isFirstLogin = $isFirstLogin")
+                        Log.d("LoginViewModel", "Login successful: userid = $userId")
 
-                        // Update state with success
-                        _loginUiState.value = LoginUiState(isLoggedIn = true, token = accessToken)
-                        // Optionally, you can store refreshToken and userId if needed
+
+                        saveUserData(context, accessToken, refreshToken, userId, rememberMe)
+
+                        _loginUiState.value = LoginUiState(isLoggedIn = true, token = accessToken, isFirstLogin = isFirstLogin)
                     } else {
-                        // Handle case where response body is null
                         _loginUiState.value = LoginUiState(errorMessage = "Login failed: No response body")
                     }
                 } else {
-                    // Update state with error message
                     _loginUiState.value = LoginUiState(errorMessage = "Login failed: ${response.message()}")
                 }
             } catch (e: Exception) {
-                // Handle exceptions during the network call
                 _loginUiState.value = LoginUiState(errorMessage = e.message)
             }
         }
-    }
-}
+    }}

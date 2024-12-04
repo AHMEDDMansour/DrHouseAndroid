@@ -51,32 +51,46 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
+    implementation(platform(libs.androidx.compose.bom))  // Make sure BOM version is up to date
+    implementation("androidx.compose.ui:ui:1.5.0")  // Add explicit Compose UI
+    implementation("androidx.compose.foundation:foundation:1.5.0")  // Add explicit Foundation
+    implementation("androidx.compose.material3:material3:1.0.0")  // Ensure Material3 is up to date
+    implementation("androidx.compose.animation:animation:1.5.0")  // Add for animations
+    implementation ("androidx.work:work-runtime-ktx:2.9.0")
+    val vicoVersion = "1.6.4"
+
+    // Vico Charts
+    implementation("com.patrykandpatryk.vico:compose:$vicoVersion")
+    implementation("com.patrykandpatryk.vico:compose-m3:$vicoVersion") // For Material 3
+    implementation("com.patrykandpatryk.vico:core:$vicoVersion")
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
     implementation(libs.androidx.navigation.compose)
-    //room db
+
+    // Room Database
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
-    //retrofitw
+    implementation(libs.androidx.room.ktx)
+
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.gson)
-    //material icons
+
+    // Material Icons
     implementation(libs.androidx.material.icons.extended)
-    //preferences datastore
-//    implementation(libs.androidx.datastore.preferences)
 }

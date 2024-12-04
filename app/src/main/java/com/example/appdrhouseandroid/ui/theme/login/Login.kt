@@ -58,31 +58,48 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
     val sharedPreferences: SharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
     val checked = remember { mutableStateOf(sharedPreferences.getBoolean("RememberMe", false)) }
 
-    // Check if RememberMe is true and if credentials are saved
-    val savedEmail = sharedPreferences.getString("Email", "")
-    val savedPassword = sharedPreferences.getString("Password", "")
-
-    if (checked.value && !savedEmail.isNullOrEmpty() && !savedPassword.isNullOrEmpty()) {
-        // If "Remember Me" is checked and credentials are found, navigate to Home directly
-        LaunchedEffect(true) {
-            navController.navigate(BottomNavigationItems.Home.route) {
-                popUpTo(navController.graph.startDestinationId) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
-    }
-
     val emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$")
     val loginUiState by viewModel.loginUiState.observeAsState(LoginUiState())
 
-    // Flags to track focus on each text field
     var emailFocused by remember { mutableStateOf(false) }
     var passwordFocused by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(checked.value, loginUiState.isLoggedIn) {
+        if (checked.value) {
+            val savedToken = sharedPreferences.getString("ACCESS_TOKEN", null)
+            if (!savedToken.isNullOrEmpty()) {
+                navController.navigate(BottomNavigationItems.Home.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        }
+
+        if (loginUiState.isLoggedIn) {
+            snackbarHostState.showSnackbar("Login successful! Welcome back.")
+            if (loginUiState.isFirstLogin) {
+                navController.navigate(Routes.GoalSettingScreen.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            } else {
+                navController.navigate(BottomNavigationItems.Home.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.backround),
@@ -127,7 +144,6 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 SocialButtonWithIcon(label = "Facebook", iconRes = R.drawable.facebok1)
             }
 
-            // Email Field
             OutlinedTextField(
                 value = email,
                 label = { Text(text = "Email") },
@@ -158,7 +174,6 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 )
             }
 
-            // Password Field
             OutlinedTextField(
                 value = password,
                 label = { Text(text = "Password") },
@@ -191,18 +206,7 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
 
             Button(
                 onClick = {
-                    // Trigger login action
-                    viewModel.loginUser(email, password)
-
-                    // If Remember Me is checked, save the email and password
-                    if (checked.value) {
-                        sharedPreferences.edit().apply {
-                            putString("Email", email)
-                            putString("Password", password)
-                            putBoolean("RememberMe", true)
-                            apply()
-                        }
-                    }
+                    viewModel.loginUser(context, email, password, checked.value)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -214,25 +218,8 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                 Text(text = "Login")
             }
 
-            // Loading Indicator
             if (loginUiState.isLoading) {
                 CircularProgressIndicator()
-            }
-
-            // Show Snackbar on successful login
-            if (loginUiState.isLoggedIn) {
-                LaunchedEffect(loginUiState.isLoggedIn) {
-                    if (loginUiState.isLoggedIn) {
-                        snackbarHostState.showSnackbar("Login successful! Welcome back.")
-                        navController.navigate(BottomNavigationItems.Home.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                }
             }
 
             Row(modifier = Modifier.padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -240,16 +227,12 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                     checked = checked.value,
                     onCheckedChange = {
                         checked.value = it
-                        if (!it) {
-                            // If unchecked, clear saved credentials
-                            sharedPreferences.edit().clear().apply()
-                        }
+                        sharedPreferences.edit().putBoolean("RememberMe", it).apply()
                     }
                 )
                 Text(text = "Remember me")
             }
 
-            // Forgot password link
             Text(
                 "Forgot password",
                 color = Color(0xFF2980B9),
@@ -267,33 +250,26 @@ fun Login(navController: NavHostController, viewModel: LoginViewModel = viewMode
                     })
             )
 
-
-            // Sign-up navigation link
             Text(
                 "Don’t have an account? Join us",
                 color = Color(0xFF2980B9),
                 fontSize = 14.sp,
                 modifier = Modifier
-                    .padding(top = 16.dp) // Adjust top padding to ensure it’s visible
-                    .align(Alignment.CenterHorizontally) // Align it horizontally at the center
+                    .padding(top = 16.dp)
+                    .align(Alignment.CenterHorizontally)
                     .clickable {
                         navController.navigate(Routes.SignUp.route) {
-
-
                         }
                     }
             )
         }
 
-        // Snackbar Host for feedback
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
 }
-
-
 @Composable
 fun SocialButtonWithIcon(label: String, iconRes: Int) {
     Row(
