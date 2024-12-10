@@ -24,12 +24,12 @@ fun BottomBar(
         BottomNavigationItems.Home,
         BottomNavigationItems.Reminder,
         BottomNavigationItems.AIscreen,
-        BottomNavigationItems.Screen1,
+        BottomNavigationItems.ProductView,
         BottomNavigationItems.Favorite
 
     )
     NavigationBar (modifier = modifier,
-        containerColor = Color(0xFF2980B9)
+        containerColor = Color(0xFF009AEE)
         //Color(0xFF30BE30)
     ){
         val navBackStackEntry = navController.currentBackStackEntryAsState().value

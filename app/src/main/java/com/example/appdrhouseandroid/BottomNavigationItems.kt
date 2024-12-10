@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.Diamond
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BottomNavigationItems (
@@ -34,9 +35,9 @@ sealed class BottomNavigationItems (
         icon = Icons.Outlined.Api
     )
 
-    object Screen1 : BottomNavigationItems(
-        route = "Screen1",
-        title = "Screen1",
+    object ProductView : BottomNavigationItems(
+        route = "ProductView",
+        title = "ProductView",
         icon = Icons.Outlined.Diamond
     )
 
@@ -45,4 +46,12 @@ sealed class BottomNavigationItems (
         title = "Favorite",
         icon = Icons.Outlined.Favorite
     )
+
+    object OCRScreen : BottomNavigationItems(
+        route = "OCRScreen",
+        title = "OCRScreen",
+        icon = Icons.Outlined.PictureAsPdf
+    )
+
+
 }
