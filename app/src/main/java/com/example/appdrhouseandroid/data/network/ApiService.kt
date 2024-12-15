@@ -49,74 +49,32 @@ data class SignUpResponse(
 )
 
 data class ForgotPasswordRequest(val email: String)
-data class ForgotPasswordResponse(val message: String, val resetCode: String)
-
+data class ForgotPasswordResponse(
+    val message: String,
+    val resetToken: String
+)
 data class VerifyCodeRequest(val email: String ,val code: String)
 
 data class VerifyCodeResponse(val message: String)
 
 data class ResetPasswordRequest(
-    val email: String,
-    val code: String,
+    val verifiedToken: String,
     val newPassword: String
 )
 data class SymptomsRequest(val symptoms: List<String>)
 
 //tracking
-data class CreateTrackingRequest(
-    val goalId: String,
-    val actualSteps: Int,
-    val actualWater: Int,
-    val actualSleepHours: Int,
-    val actualCoffeeCups: Int,
-    val actualWorkout: Int,
-    val notes: String?
-)
 
-data class TrackingResponse(
-    val _id: String,
-    val userId: String,
-    val goalId: String,
-    val actualSteps: Int,
-    val actualWater: Int,
-    val actualSleepHours: Int,
-    val actualCoffeeCups: Int,
-    val actualWorkout: Int,
-    val notes: String?,
-    val date: String
-)
 
-data class GoalComparisonResponse(
-    val tracking: TrackingResponse,
-    val comparison: ComparisonResult
-)
 
-data class ComparisonResult(
-    val stepsAchieved: Boolean,
-    val waterAchieved: Boolean,
-    val sleepAchieved: Boolean,
-    val coffeeWithinLimit: Boolean,
-    val workoutAchieved: Boolean
-)
 
-//proggres hedhi eli jdida
-data class UpdateProgressDto(
-    val stepsCompleted: Int? = null,
-    val waterConsumed: Int? = null,
-    val sleepHoursCompleted: Int? = null,
-    val coffeeCupsConsumed: Int? = null,
-    val workoutMinutes: Int? = null
-)
+
+
+
+
 
 //goals
 
-data class AddGoalRequest(
-    val steps: Int,
-    val water: Int,
-    val sleepHours: Int,
-    val coffeeCups: Int,
-    val workout: Int
-)
 
 data class AddGoalDto(
     val steps: Int,
@@ -134,14 +92,12 @@ data class UpdateProgressRequest(
     val workout: Int?,
     val notes: String = ""  // Optional, defaults to empty string
 )
-
-data class UpdateGoalRequest(
-    val steps: Int,
-    val water: Int,
-    val sleepHours: Int,
-    val coffeeCups: Int,
-    val workout: Int
+data class VerifyResetCodeRequest(
+    val resetToken: String,
+    val code: String
 )
+
+
 data class UpdateGoalDto(
     val steps: Int? = null,
     val water: Int? = null,
@@ -173,7 +129,13 @@ data class ProgressResponse(
     val workout: Int?,
     val notes: String?
 )
-
+data class VerifyResetCodeResponse(
+    val message: String,
+    val verifiedToken: String
+)
+data class ResetPasswordResponse(
+    val message: String
+)
 
 
 
@@ -185,13 +147,13 @@ interface ApiService {
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
     @POST("auth/forgot-password")
-    fun forgotPassword(@Body request: ForgotPasswordRequest): Call<ForgotPasswordResponse>
+    suspend fun requestPasswordReset(@Body request: ForgotPasswordRequest): ForgotPasswordResponse
 
     @POST("auth/verify-reset-code")
-    fun verifyResetCode(@Body request: VerifyCodeRequest): Call<VerifyCodeResponse>
+    suspend fun verifyResetCode(@Body request: VerifyResetCodeRequest): VerifyResetCodeResponse
 
     @POST("auth/reset-password")
-    fun resetPassword(@Body request: ResetPasswordRequest): Call<Void>
+    suspend fun resetPassword(@Body request: ResetPasswordRequest): ResetPasswordResponse
 
     @POST("prediction/symptoms")
     suspend fun getPrediction(@Body request: SymptomsRequest): Response<PredictionResponse>
@@ -217,40 +179,7 @@ interface ApiService {
         @Path("userId") userId: String
     ): Response<List<GoalResponse>>
 
-    @POST("tracking/{userId}")
-    suspend fun createTracking(
-        @Path("userId") userId: String,
-        @Body request: CreateTrackingRequest
-    ): Response<TrackingResponse>
 
-    @GET("tracking/{userId}/daily")
-    suspend fun getDailyTracking(
-        @Path("userId") userId: String,
-        @Query("date") date: String
-    ): Response<GoalComparisonResponse>
-
-
-    @GET("goals/{userId}/{goalId}/progress")
-    suspend fun getGoalProgress(
-        @Path("userId") userId: String,
-        @Path("goalId") goalId: String,
-        @Query("days") days: Int? = null
-    ): Response<List<ProgressResponse>>
-
-    @PUT("goals/{userId}/{goalId}/progress")
-    suspend fun updateProgress(
-        @Path("userId") userId: String,
-        @Path("goalId") goalId: String,
-        @Body progress: UpdateProgressDto
-    ): Response<ProgressResponse>
-
-
-    ///progress el shih
-    @POST("goals/{goalId}/progress")
-    suspend fun addProgress(
-        @Path("goalId") goalId: String,
-        @Body progressDto: UpdateProgressDto
-    ): Response<ProgressResponse>
 
     @GET("goals/{goalId}/progress/today")
     suspend fun getTodayProgress(

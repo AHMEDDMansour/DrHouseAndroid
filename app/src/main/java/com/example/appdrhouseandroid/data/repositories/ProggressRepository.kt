@@ -3,7 +3,6 @@ package com.example.appdrhouseandroid.data.repositories
 import android.content.SharedPreferences
 import com.example.appdrhouseandroid.data.network.ApiService
 import com.example.appdrhouseandroid.data.network.ProgressResponse
-import com.example.appdrhouseandroid.data.network.UpdateProgressDto
 import com.example.appdrhouseandroid.data.network.UpdateProgressRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

@@ -452,7 +452,7 @@ fun ProgressCharts(
         MetricData("Water", history.map { it.water ?: 0 }, goal.water, MaterialTheme.colorScheme.secondary),
         MetricData("Sleep", history.map { it.sleepHours ?: 0 }, goal.sleepHours, MaterialTheme.colorScheme.tertiary),
         MetricData("Coffee", history.map { it.coffeeCups ?: 0 }, goal.coffeeCups, MaterialTheme.colorScheme.error),
-        MetricData("Workout", history.map { it.workout ?: 0 }, goal.workout, MaterialTheme.colorScheme.primaryContainer)
+        MetricData("Workout", history.map { it.workout ?: 0 }, goal.workout, MaterialTheme.colorScheme.primary)
     )
 
     var selectedMetric by remember { mutableStateOf(metrics.first()) }
