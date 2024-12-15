@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appdrhouseandroid.data.network.AddGoalDto
-import com.example.appdrhouseandroid.data.network.UpdateGoalRequest
 import com.example.appdrhouseandroid.data.network.GoalResponse
 import com.example.appdrhouseandroid.data.network.UpdateGoalDto
 import com.example.appdrhouseandroid.data.repository.GoalRepository

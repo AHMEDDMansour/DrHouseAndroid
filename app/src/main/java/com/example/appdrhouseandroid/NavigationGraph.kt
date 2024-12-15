@@ -21,9 +21,7 @@ import com.example.appdrhouseandroid.ui.theme.Set_Goals.GoalSettingScreenViewMod
 import com.example.appdrhouseandroid.ui.theme.Set_Goals.ShowGoalsScreen
 import com.example.appdrhouseandroid.ui.theme.Set_Goals.UserGoals
 import com.example.appdrhouseandroid.ui.theme.WaterReminder.HealthReminder
-import com.example.appdrhouseandroid.ui.theme.forgetpassword.ConfirmCodeScreen
-import com.example.appdrhouseandroid.ui.theme.forgetpassword.ForgetPassword
-import com.example.appdrhouseandroid.ui.theme.forgetpassword.ResetPass
+import com.example.appdrhouseandroid.ui.theme.forgetpassword.PasswordResetScreen
 import com.example.appdrhouseandroid.ui.theme.login.Login
 import com.example.appdrhouseandroid.ui.theme.login.LoginViewModel
 import com.example.appdrhouseandroid.ui.theme.proggres.ProgressScreen
@@ -108,14 +106,10 @@ fun NavigationGraph(navController: NavHostController, onBottomBarVisibilityChang
             LunchScreen(navController)
         }
 
-        composable(Routes.ConfirmCode.route) {
-            onBottomBarVisibilityChanged(false)
-            ConfirmCodeScreen(navController)
-        }
 
         composable(Routes.ForgetPassword.route) {
             onBottomBarVisibilityChanged(false)
-            ForgetPassword(navController)
+            PasswordResetScreen(navController)
         }
 
         composable(Routes.PredictionScreen.route) {
@@ -123,10 +117,7 @@ fun NavigationGraph(navController: NavHostController, onBottomBarVisibilityChang
             PredictionScreen(predictionViewModel)
         }
 
-        composable(Routes.ResetPass.route) {
-            onBottomBarVisibilityChanged(false)
-            ResetPass(navController)
-        }
+
 
         composable(Routes.Login.route) {
             onBottomBarVisibilityChanged(false)
