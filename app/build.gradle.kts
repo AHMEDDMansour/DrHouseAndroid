@@ -74,8 +74,10 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
 
     //ocrtextfulter
-   // implementation("com.google.mlkit:text-recognition:19.1.0")
     implementation(libs.mlkit.text.recognition)
+
+    //stripe payement
+
 
 
     // Room database

@@ -20,6 +20,8 @@ roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
 materialIconsExtended = "1.7.4"
 runtimeLivedata = "1.7.5"
+
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -49,6 +51,7 @@ retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", v
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 mlkit-text-recognition = { module = "com.google.mlkit:text-recognition", version = "16.0.0" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

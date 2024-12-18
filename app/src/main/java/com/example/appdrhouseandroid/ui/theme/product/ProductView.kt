@@ -31,20 +31,16 @@
     import com.example.appdrhouseandroid.data.network.ProductResponse
     import androidx.compose.material3.Surface
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.geometry.Offset
-    import androidx.compose.ui.geometry.Size
-    import androidx.compose.ui.graphics.Outline.Rectangle
     import androidx.compose.ui.platform.LocalContext
     import androidx.compose.ui.text.style.TextOverflow
     import androidx.compose.ui.window.Dialog
     import androidx.lifecycle.ViewModel
     import androidx.lifecycle.ViewModelProvider
     import androidx.navigation.NavController
-    import coil.compose.AsyncImagePainter
-    import coil.compose.rememberImagePainter
-    import com.example.appdrhouseandroid.data.network.ApiService
+    import com.example.appdrhouseandroid.Routes
     import com.example.appdrhouseandroid.data.repositories.OcrRepository
     import com.example.appdrhouseandroid.ui.theme.OCR.OCRViewModel
+
 
     class OCRViewModelFactory(private val apiService: OcrRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -59,23 +55,20 @@
     fun ProductView(
         navController: NavController,
         viewModel: ProductViewModel = viewModel(),
-        ocrViewModel: OCRViewModel // Pass OCRViewModel as a parameter
+        ocrViewModel: OCRViewModel,
+     //   cartViewModel: CartViewModel = viewModel(),
     ) {
-        // Observing product state from ViewModel
         val products by viewModel.products.collectAsState()
         val isLoading by viewModel.isLoading.collectAsState()
         val error by viewModel.error.collectAsState()
+        val cartItems = viewModel.cartItems // Direct access to cart items list
 
-        // States for filtering and searching
         val categories = listOf("All", "Vitamins", "MultiVit", "Minerals", "Bio-Meds", "Supplements", "Protein")
         var selectedCategory by remember { mutableStateOf("All") }
         var searchQuery by remember { mutableStateOf("") }
+        var selectedProduct by remember { mutableStateOf<ProductResponse?>(null) }
         val context = LocalContext.current
 
-        //searchQuery = medicineName
-        var selectedProduct by remember { mutableStateOf<ProductResponse?>(null) }
-
-        // Automatically load products based on selected category
         LaunchedEffect(selectedCategory) {
             if (selectedCategory == "All") {
                 viewModel.loadAllProducts()
@@ -89,9 +82,34 @@
                 .fillMaxSize()
                 .background(Color(0xFFF5F5F5))
         ) {
-            // Button to view the cart
-            ViewCartButton(navController = navController)
+            // Cart summary and navigation
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Cart (${cartItems.size} items): €${"%.2f".format(viewModel.calculateTotalPrice())}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF009AEE)
+                )
+                Button(
+                    onClick = { navController.navigate(Routes.CheckoutScreen.route) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009AEE))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Cart",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("View Cart")
+                }
+            }
 
+            // Search and camera row
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,23 +117,18 @@
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Search bar for manual input
                 SearchBar(
                     query = searchQuery,
                     onQueryChange = { searchQuery = it },
                     modifier = Modifier.weight(1f)
                 )
                 CameraButton(
-                    ocrViewModel = ocrViewModel, // Pass the view model instance
-                    onOCRResult = { extractedName ->
-                        // Update the search query with the extracted medicine name
-                        searchQuery = extractedName
-                    }
+                    ocrViewModel = ocrViewModel,
+                    onOCRResult = { searchQuery = it }
                 )
-
             }
 
-            // Category filter for products
+            // Category filter
             CategoryFilter(
                 categories = categories,
                 selectedCategory = selectedCategory,
@@ -123,32 +136,49 @@
                 modifier = Modifier.padding(vertical = 18.dp)
             )
 
-            // Handle loading, error, or display product grid
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else if (error != null) {
-                Text(
-                    text = error ?: "",
-                    color = Color.Red,
-                    modifier = Modifier.padding(16.dp)
-                )
-            } else {
-                // Display products filtered by category and search query
-                ProductGrid(
-                    products = products.filter {
-                        (selectedCategory == "All" || it.category == selectedCategory) &&
-                                it.name.contains(searchQuery, ignoreCase = true)
-                    },
-                    onProductClicked = { product -> selectedProduct = product }
-                )
+            // Main content
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
+                error != null -> {
+                    Text(
+                        text = error ?: "",
+                        color = Color.Red,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+                else -> {
+                    ProductGrid(
+                        products = products.filter {
+                            (selectedCategory == "All" || it.category == selectedCategory) &&
+                                    it.name.contains(searchQuery, ignoreCase = true)
+                        },
+                        onProductClicked = { product -> selectedProduct = product },
+                        onAddToCart = { product ->
+                            viewModel.addToCart(product)
+                            Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
             }
 
-            // Display product details dialog when a product is selected
-            selectedProduct?.let {
-                ProductDetailDialog(product = it, onDismiss = { selectedProduct = null })
+            // Product detail dialog
+            selectedProduct?.let { product ->
+                ProductDetailDialog(
+                    product = product,
+                    onDismiss = { selectedProduct = null },
+                  //  cartViewModel = cartViewModel,
+                    onAddToCart = {
+                        viewModel.addToCart(it)
+                        Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
+                        selectedProduct = null
+                    }
+                )
             }
         }
     }
+
 
     @Composable
     fun CameraButton(
@@ -195,8 +225,6 @@
 
     }
 
-
-
     @Composable
     fun SearchBar(query: String, onQueryChange: (String) -> Unit, modifier: Modifier = Modifier) {
         OutlinedTextField(
@@ -213,11 +241,13 @@
         )
     }
 
-
-
     @Composable
-    fun ProductDetailDialog(product: ProductResponse, onDismiss: () -> Unit) {
-        val imageUrl = "http://192.168.100.12:3000" + product.image // Replace with your local IP address
+    fun ProductDetailDialog(
+        product: ProductResponse,
+        onDismiss: () -> Unit,
+        onAddToCart: (ProductResponse) -> Unit
+    ) {
+        val imageUrl = "http://192.168.40.201:3000" + product.image // Replace with your local IP address
 
         Dialog(onDismissRequest = onDismiss) {
             Surface(
@@ -270,7 +300,7 @@
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = { /* Add to cart logic */ },
+                        onClick = { onAddToCart(product) },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009AEE)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -330,24 +360,33 @@
     }
 
     @Composable
-    fun ProductGrid(products: List<ProductResponse>, onProductClicked: (ProductResponse) -> Unit) {
+    fun ProductGrid(
+        products: List<ProductResponse>,
+        onProductClicked: (ProductResponse) -> Unit,
+        onAddToCart: (ProductResponse) -> Unit
+    ) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(1.dp),
-            modifier = Modifier
-                .padding(vertical = 14.dp),
+            modifier = Modifier.padding(vertical = 14.dp),
         ) {
             items(products) { product ->
-                ProductCard(product = product, onProductClicked = onProductClicked)
-              //  ProductDetailDialog(product = it, onDismiss = { selectedProduct = null })
-
+                ProductCard(
+                    product = product,
+                    onProductClicked = onProductClicked,
+                    onAddToCart = onAddToCart
+                )
             }
         }
     }
 
     @Composable
-    fun ProductCard(product: ProductResponse, onProductClicked: (ProductResponse) -> Unit) {
-        val imageUrl = "http://192.168.100.12:3000" + product.image // Replace with your local IP address
+    fun ProductCard(
+        product: ProductResponse,
+        onProductClicked: (ProductResponse) -> Unit,
+        onAddToCart: (ProductResponse) -> Unit
+    ) {
+        val imageUrl = "http://192.168.40.201:3000" + product.image // Replace with your local IP address
 
         Card(
             modifier = Modifier
@@ -404,25 +443,29 @@
                         ),
                         modifier = Modifier.padding(top = 4.dp) // Reduced space
                     )
+
+                    Button(
+                        onClick = {  onAddToCart(product) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009AEE)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Add to Cart",
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Add to Cart",
+                            style = MaterialTheme.typography.bodySmall.copy(color = Color.White)
+                        )
+                    }
                 }
             }
         }
     }
 
-    @Composable
-    fun ViewCartButton(navController: NavController) {
-
-        Button(
-            onClick = {navController.navigate("CartView") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009AEE)),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-
-        ) {
-            Text(text = "View Cart", color = Color.White) //a revoire
-        }
-    }
 
 
 

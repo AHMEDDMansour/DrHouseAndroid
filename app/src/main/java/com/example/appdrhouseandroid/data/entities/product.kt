@@ -1,5 +1,7 @@
 package com.example.appdrhouseandroid.data.entities
 
+import com.example.appdrhouseandroid.data.network.ProductResponse
+
 data class Product(
     val id: String? = null,
     val name: String,
@@ -8,3 +10,4 @@ data class Product(
     val category: String,
     val image: String? = null
 )
+

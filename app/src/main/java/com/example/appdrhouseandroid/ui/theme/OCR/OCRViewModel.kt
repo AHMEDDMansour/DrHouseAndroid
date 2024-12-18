@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log // Import for logging
 import androidx.compose.ui.graphics.Outline.Rectangle
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appdrhouseandroid.data.network.OcrResponse
@@ -33,47 +34,6 @@ class OCRViewModel(private val apiService: OcrRepository) : ViewModel() {
     private val _ocrResult = MutableStateFlow<Response<OcrResponse>?>(null)
     val ocrResult: StateFlow<Response<OcrResponse>?> = _ocrResult
 
-
-
-
-
-    // Function to extract medicine name using keywords
-    fun extractMedicineNameUsingKeywords(visionText: Text): String {
-        val medicineKeywords = listOf(
-            "aKtiv","GROSSIVIT", "GROSSI", "Cold", "Flu", "Cough", "Med", "Capsule", "Tablet",
-            "Supplement", "Syrup", "Herb", "Natural", "Health", "Boost", "Relief", "Remedy",
-            "Immune", "Strength"
-        )
-
-        visionText.textBlocks.forEach { block ->
-            block.lines.forEach { line ->
-                line.elements.forEach { element ->
-                    val text = element.text
-                    if (medicineKeywords.any { keyword -> text.contains(keyword, ignoreCase = true) }) {
-                        return text // Return as soon as a match is found
-                    }
-                }
-            }
-        }
-
-        return "" // Return empty if no match is found
-    }
-
-    // Function to process the image and extract text
-    fun processImageForMedicineName(imageUri: Uri, context: Context, onSuccess: (String) -> Unit) {
-        val inputImage = InputImage.fromFilePath(context, imageUri)
-        val recognizer: TextRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-
-        recognizer.process(inputImage)
-            .addOnSuccessListener { visionText ->
-                val medicineName = extractMedicineNameUsingKeywords(visionText)
-                onSuccess(medicineName.takeIf { it.isNotEmpty() } ?: "No matching medicine name found.")
-            }
-            .addOnFailureListener { e ->
-                Log.e("OCRViewModel", "Text recognition failed: ", e)
-            }
-    }
-
     // Function to upload image and get OCR result
     fun uploadImage(imagePart: MultipartBody.Part) {
         viewModelScope.launch {
@@ -95,14 +55,25 @@ class OCRViewModel(private val apiService: OcrRepository) : ViewModel() {
         return try {
             val contentResolver: ContentResolver = context.contentResolver
             val inputStream = contentResolver.openInputStream(uri)
-            val tempFile = File(context.cacheDir, "temp_image.jpg")
+
+            // Create a unique temporary file name using timestamp to avoid overwriting
+            val timestamp = System.currentTimeMillis()
+            val tempFile = File(context.cacheDir, "temp_image_$timestamp.jpg")
 
             inputStream?.use { input ->
-                FileOutputStream(tempFile).use { output -> input.copyTo(output) }
+                FileOutputStream(tempFile).use { output ->
+                    input.copyTo(output)
+                }
             }
 
+            // Create the MultipartBody.Part for uploading
             val requestBody = tempFile.asRequestBody("image/*".toMediaTypeOrNull())
-            MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
+            val part = MultipartBody.Part.createFormData("file", tempFile.name, requestBody)
+
+            // Optional: Clean up the file after the upload is done (make sure this doesn't cause issues)
+            tempFile.deleteOnExit()
+
+            part
         } catch (e: Exception) {
             Log.e("OCRViewModel", "Error creating image part", e)
             null

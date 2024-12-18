@@ -15,9 +15,8 @@ sealed class Routes(val route: String){
     object ResetPass : Routes ("ResetPassword")
     object OCRScreen : Routes ("OCRScreen   ")
     object ProductView : Routes ("ProductView   ")
-    object CartView : Routes ("CartView")
-    object CameraScreen : Routes ("CameraScreen")
-
+    object CheckoutScreen : Routes ("checkout")
+    object  OrderConfirmation : Routes ("order_confirmation")
 
 
 

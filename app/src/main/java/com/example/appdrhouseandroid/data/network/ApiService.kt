@@ -1,7 +1,9 @@
 package com.example.appdrhouseandroid.data.network
 
-import com.example.appdrhouseandroid.data.entities.Product
-import com.example.appdrhouseandroid.data.entities.user
+
+import com.example.appdrhouseandroid.ui.theme.product.OrderRequest
+import com.example.appdrhouseandroid.ui.theme.product.OrderResponse
+import com.google.gson.annotations.SerializedName
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -10,11 +12,11 @@ import retrofit2.http.POST
 import retrofit2.Call
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.Part
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 // Request model for login
 data class LoginRequest(
@@ -58,7 +60,6 @@ data class OcrResponse(
 )
 
 
-
 data class ProductRequest(
     val name: String,
     val description: String,
@@ -70,7 +71,8 @@ data class ProductRequest(
 
 // ProductResponse.kt
 data class ProductResponse(
-    val id: String,
+    @SerializedName("_id")
+    val _id: String,
     val name: String,
     val description: String,
     val price: Double,
@@ -78,11 +80,28 @@ data class ProductResponse(
     val image : String? = null
 )
 
-data class ProductCategoryRequest(
-    val page: Int = 1,        // Default to page 1
-    val sortBy: String = "name"  // Default to sorting by 'name'
+//data class CartItem(
+//    val productId: String,
+//    val quantity: Int,
+//    val price: Double
+//)
+//
+//data class OrderRequest(
+//    val items: List<OrderItem>,
+//    val totalAmount: Double
+//)
+
+
+
+
+data class CreatePaymentIntentRequest(
+    val amount: Int,
+    val currency: String
 )
 
+data class PaymentIntentResponse(
+    val clientSecret: String
+)
 
 interface ApiService {
     @POST("auth/signup") // Ensure this matches your backend route
@@ -106,6 +125,18 @@ interface ApiService {
     suspend fun uploadImage(
         @Part file: MultipartBody.Part
     ): Response<OcrResponse>
+
+    /* Payement  */
+    @POST("payment/create-intent")
+    fun createPaymentIntent(@Body paymentRequest: CreatePaymentIntentRequest): Call<PaymentIntentResponse>
+
+    /* Cart */
+    @POST("orders")
+    @Headers("Content-Type: application/json")
+    suspend fun createOrder(@Body order: OrderRequest): Response<OrderResponse>
+
+    @GET("orders")
+    suspend fun getOrders(): Response<List<OrderResponse>>
 
     /*  Product */
 

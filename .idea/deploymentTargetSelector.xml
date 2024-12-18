@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="AppDrHouseAndroid.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-12-06T17:14:18.319976500Z">
+        <DropdownSelection timestamp="2024-12-15T12:37:00.621649400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=RZ8N200NCGD" />

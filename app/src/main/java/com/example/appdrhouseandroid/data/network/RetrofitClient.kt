@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
 
     // Change the BASE_URL to your backend address. You can update it later based on the environment (local or production).
-     const val BASE_URL = "http:/192.168.100.12:3000/"
+     const val BASE_URL = "http://192.168.40.201:3000/"
 
     private val retrofit by lazy {
         // Add logging interceptor for debugging
