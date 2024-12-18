@@ -23,11 +23,14 @@ import androidx.core.content.ContextCompat
 import androidx.work.WorkManager
 
 class MainActivity : ComponentActivity() {
+    private val ACTIVITY_RECOGNITION_REQUEST_CODE = 100
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requestActivityRecognitionPermission()
+        }
         // Cancel any existing work when the app starts
         cancelAllExistingWork()
 
@@ -59,6 +62,20 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun requestActivityRecognitionPermission() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                ACTIVITY_RECOGNITION_REQUEST_CODE
+            )
         }
     }
 

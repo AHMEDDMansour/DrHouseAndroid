@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.Diamond
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.ShoppingBasket
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BottomNavigationItems (
@@ -22,10 +23,10 @@ sealed class BottomNavigationItems (
         icon = Icons.Outlined.Home
     )
 
-    object HealthReminder : BottomNavigationItems(
-        route = "HealthReminder",
-        title = "Reminder",
-        icon = Icons.Outlined.Notifications
+    object ProductView : BottomNavigationItems(
+        route = "ProductView",
+        title = "Products",
+        icon = Icons.Outlined.ShoppingBasket
     )
 
     object PredectionScreen : BottomNavigationItems(
@@ -41,8 +42,8 @@ sealed class BottomNavigationItems (
     )
 
     object GoalReminder : BottomNavigationItems(
-        route = "GoalReminder",
-        title = "Favorite",
+        route = "Profile",
+        title = "Profile",
         icon = Icons.Outlined.Favorite
     )
 }

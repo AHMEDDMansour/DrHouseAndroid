@@ -68,12 +68,17 @@ fun ProgressScreen(
 
     var selectedTab by remember { mutableStateOf(0) }
     val tabs = listOf("Today's Progress", "History")
+    val steps by progressViewModel.currentSteps.collectAsState()
 
     LaunchedEffect(userId) {
+        goals?.firstOrNull()?.id?.let { goalId ->
+            progressViewModel.updateSteps(goalId, steps)
+        }
         if (userId != null) {
             Log.d("ProgressScreen", "Fetching goals for userId: $userId")
             goalViewModel.fetchGoals(userId)
         }
+
     }
 
     Column(

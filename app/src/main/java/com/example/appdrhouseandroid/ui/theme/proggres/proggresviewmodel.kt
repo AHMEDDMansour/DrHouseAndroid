@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.appdrhouseandroid.data.network.ProgressResponse
 import com.example.appdrhouseandroid.data.network.UpdateProgressRequest
 import com.example.appdrhouseandroid.data.repositories.ProgressRepository
+import com.example.appdrhouseandroid.ui.theme.StepCounter.StepCounter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,10 +16,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class ProgressViewModel(private val repository: ProgressRepository) : ViewModel() {
+class ProgressViewModel(private val repository: ProgressRepository,private val stepCounter: StepCounter) : ViewModel() {
     private val _progressState = MutableStateFlow<ProgressUIState>(ProgressUIState.Initial)
     val progressState: StateFlow<ProgressUIState> = _progressState
-
+    val currentSteps: StateFlow<Int> = stepCounter.steps
     private val _progressHistoryState = MutableStateFlow<ProgressHistoryState>(ProgressHistoryState.Initial)
     val progressHistoryState: StateFlow<ProgressHistoryState> = _progressHistoryState
 
@@ -26,6 +27,38 @@ class ProgressViewModel(private val repository: ProgressRepository) : ViewModel(
 
     fun setError(message: String) {
         _progressState.value = ProgressUIState.Error(message)
+    }
+    fun updateSteps(goalId: String?, steps: Int) {
+        viewModelScope.launch {
+            try {
+                requireNotNull(goalId) { "Goal ID cannot be null" }
+                require(goalId.isNotBlank()) { "Goal ID cannot be empty" }
+
+                _progressState.value = ProgressUIState.Loading
+
+                val currentDate = dateFormat.format(Date())
+                val progressRequest = UpdateProgressRequest(
+                    date = currentDate,
+                    steps = steps,
+                    water = null,
+                    sleepHours = null,
+                    coffeeCups = null,
+                    workout = null
+                )
+
+                val response = repository.addProgress(goalId, progressRequest)
+                if (response.isSuccessful && response.body() != null) {
+                    _progressState.value = ProgressUIState.Success(response.body()!!)
+                    // Refresh progress history after successful update
+                    getProgressHistory(goalId)
+                } else {
+                    val errorMsg = response.errorBody()?.string() ?: "Failed to update steps"
+                    _progressState.value = ProgressUIState.Error(errorMsg)
+                }
+            } catch (e: Exception) {
+                _progressState.value = ProgressUIState.Error(e.message ?: "Unknown error occurred")
+            }
+        }
     }
 
     fun getTodayProgress(goalId: String?) {

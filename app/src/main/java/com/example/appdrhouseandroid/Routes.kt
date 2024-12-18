@@ -17,8 +17,11 @@ sealed class Routes(val route: String){
     object GoalSettingScreen:Routes("GoalSettingScreen")
     object ShowGoalsScreen:Routes("ShowGoalsScreen")
     object ProgressScreen:Routes("ProgressScreen")
-
     object GoalReminder:Routes("GoalReminder")
+    object Profile:Routes("Profile")
+    object OCRScreen : Routes ("OCRScreen")
+    object ProductView : Routes ("ProductView")
+    object CheckoutScreen : Routes ("checkout")
 
 
 

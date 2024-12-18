@@ -1,12 +1,13 @@
 package com.example.appdrhouseandroid.data.network
 
+import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.1.251:3000/"
+    private const val BASE_URL = "http:/192.168.40.19:3000/"
 
     private val retrofit by lazy {
         // Create logging interceptor
@@ -20,10 +21,11 @@ object RetrofitClient {
             .addInterceptor(logging)
             .build()
 
+        val gson = GsonBuilder().setLenient().create()
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 
